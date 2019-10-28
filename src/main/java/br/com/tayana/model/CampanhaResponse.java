@@ -4,10 +4,18 @@ import java.time.LocalDate;
 
 public class CampanhaResponse {
 	
+	private Integer id;
 	private Integer idTime;
 	private String nome;
 	private LocalDate dataInicio;
 	private LocalDate dataFim;
+	
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
 	
 	public Integer getIdTime() {
 		return idTime;

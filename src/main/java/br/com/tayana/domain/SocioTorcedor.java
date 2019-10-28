@@ -1,7 +1,11 @@
 package br.com.tayana.domain;
 
 import java.io.Serializable;
+import java.util.List;
 
+import javax.persistence.Id;
+
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import br.com.tayana.enums.TimesEnum;
@@ -11,15 +15,20 @@ public class SocioTorcedor implements Serializable{
 	
 	private static final long serialVersionUID = 1088671613724631995L;
 	
-	private Integer id;
+	@Transient
+	public static final String SEQUENCE_NAME = "seq_sociotorcedor";
+	
+	@Id
+	private long id;
 	private String nome;
 	private String email;
 	private TimesEnum time;
+	private List<Integer> campanhas;
 	
-	public Integer getId() {
+	public long getId() {
 		return id;
 	}
-	public void setId(Integer id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 	public String getNome() {
@@ -39,6 +48,12 @@ public class SocioTorcedor implements Serializable{
 	}
 	public void setTime(TimesEnum time) {
 		this.time = time;
+	}
+	public List<Integer> getCampanhas() {
+		return campanhas;
+	}
+	public void setCampanhas(List<Integer> campanhas) {
+		this.campanhas = campanhas;
 	}
 
 }
