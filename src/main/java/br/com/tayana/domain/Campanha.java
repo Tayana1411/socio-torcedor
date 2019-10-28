@@ -2,9 +2,6 @@ package br.com.tayana.domain;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 

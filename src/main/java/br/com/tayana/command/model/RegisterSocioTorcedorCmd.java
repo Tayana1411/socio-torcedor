@@ -3,7 +3,6 @@ package br.com.tayana.command.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import br.com.tayana.command.SocioTorcedorLogicCommand;
-import br.com.tayana.domain.Campanha;
 import br.com.tayana.domain.SocioTorcedor;
 import br.com.tayana.infra.mongodb.SequenceGeneratorService;
 import br.com.tayana.model.CampanhaResponse;
@@ -24,8 +22,10 @@ public class RegisterSocioTorcedorCmd implements SocioTorcedorLogicCommand {
 
 	private SocioTorcedorRequest request;
 	private SocioTorcedorResponse response;
-	private SocioTorcedorService service;
+
+	private SocioTorcedor socioTorcedorCadastrado;
 	private SequenceGeneratorService sequenceGenerator;
+	private SocioTorcedorService service;
 	
 	public RegisterSocioTorcedorCmd(SocioTorcedorService service, SequenceGeneratorService sequenceGenerator) {
 		this.service = service;
@@ -35,44 +35,43 @@ public class RegisterSocioTorcedorCmd implements SocioTorcedorLogicCommand {
 	@Override
 	public void execute() {
 
-		 SocioTorcedor socioTorcedorCadastrado;
-		 
-		 socioTorcedorCadastrado = service.findByEmail(getRequest().getEmail());
-		
-		 if(socioTorcedorCadastrado == null) {
-			 socioTorcedorCadastrado = new SocioTorcedor();
-			 socioTorcedorCadastrado.setId(sequenceGenerator.generateSequence(SocioTorcedor.SEQUENCE_NAME));
-			 socioTorcedorCadastrado.setNome(getRequest().getNome());
-			 socioTorcedorCadastrado.setEmail(getRequest().getEmail());
-			 socioTorcedorCadastrado.setTime(getRequest().getTime());
-		 }
+		setSocioTorcedorCadastrado(service.findByEmail(getRequest().getEmail()));
+
+		if (getSocioTorcedorCadastrado() == null) {
+			setSocioTorcedorCadastrado(new SocioTorcedor());
+			getSocioTorcedorCadastrado().setNome(getRequest().getNome());
+			getSocioTorcedorCadastrado().setEmail(getRequest().getEmail());
+			getSocioTorcedorCadastrado().setTime(getRequest().getTime());
+		}
 
 		RestTemplate restTemplate = new RestTemplate();
 
 		ResponseEntity<List<CampanhaResponse>> responseEntity = restTemplate.exchange(
-				"http://localhost:8080/campanha/time/" + socioTorcedorCadastrado.getTime().getId(), HttpMethod.GET,
+				"http://localhost:8080/campanhas/time/" + getSocioTorcedorCadastrado().getTime().getId(), HttpMethod.GET,
 				null, new ParameterizedTypeReference<List<CampanhaResponse>>() {
 				});
 		List<CampanhaResponse> campanhas = responseEntity.getBody();
 
-		if (socioTorcedorCadastrado.getCampanhas() == null) {
-			socioTorcedorCadastrado.setCampanhas(new ArrayList<Integer>());
+		if (getSocioTorcedorCadastrado().getCampanhas() == null) {
+			getSocioTorcedorCadastrado().setCampanhas(new ArrayList<Integer>());
 		}
 		
-		for (CampanhaResponse campanha : campanhas) {
-			if (!socioTorcedorCadastrado.getCampanhas().contains(campanha.getId())) {
-				socioTorcedorCadastrado.getCampanhas().add(campanha.getIdTime());
+		if(campanhas!= null) {
+			for (CampanhaResponse campanha : campanhas) {
+				if (!getSocioTorcedorCadastrado().getCampanhas().contains(campanha.getId())) {
+					getSocioTorcedorCadastrado().getCampanhas().add(campanha.getIdTime());
+				}
 			}
 		}
 
-		socioTorcedorCadastrado = service.insert(socioTorcedorCadastrado);
+		setSocioTorcedorCadastrado(service.insert(getSocioTorcedorCadastrado()));
 		
 		response = new SocioTorcedorResponse();
-		response.setId(socioTorcedorCadastrado.getId());
-		response.setEmail(socioTorcedorCadastrado.getEmail());
-		response.setNome(socioTorcedorCadastrado.getNome());
-		response.setTime(socioTorcedorCadastrado.getTime());
-		response.setCampanhas(socioTorcedorCadastrado.getCampanhas());
+		response.setId(sequenceGenerator.generateSequence(SocioTorcedor.SEQUENCE_NAME));
+		response.setEmail(getSocioTorcedorCadastrado().getEmail());
+		response.setNome(getSocioTorcedorCadastrado().getNome());
+		response.setTime(getSocioTorcedorCadastrado().getTime());
+		response.setCampanhas(getSocioTorcedorCadastrado().getCampanhas());
 	}
 
 	public SocioTorcedorRequest getRequest() {
@@ -89,6 +88,14 @@ public class RegisterSocioTorcedorCmd implements SocioTorcedorLogicCommand {
 
 	public void setResponse(SocioTorcedorResponse response) {
 		this.response = response;
+	}
+
+	public SocioTorcedor getSocioTorcedorCadastrado() {
+		return socioTorcedorCadastrado;
+	}
+
+	public void setSocioTorcedorCadastrado(SocioTorcedor socioTorcedorCadastrado) {
+		this.socioTorcedorCadastrado = socioTorcedorCadastrado;
 	}
 
 }

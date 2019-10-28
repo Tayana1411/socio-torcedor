@@ -6,7 +6,6 @@ import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventLis
 import org.springframework.data.mongodb.core.mapping.event.BeforeConvertEvent;
 import org.springframework.stereotype.Component;
 
-import br.com.tayana.domain.Campanha;
 import br.com.tayana.domain.SocioTorcedor;
 
 

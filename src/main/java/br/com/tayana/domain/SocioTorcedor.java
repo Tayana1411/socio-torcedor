@@ -3,8 +3,6 @@ package br.com.tayana.domain;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.Id;
-
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,9 +14,8 @@ public class SocioTorcedor implements Serializable{
 	private static final long serialVersionUID = 1088671613724631995L;
 	
 	@Transient
-	public static final String SEQUENCE_NAME = "seq_sociotorcedor";
+	public static final String SEQUENCE_NAME = "seq_socioTorcedor";
 	
-	@Id
 	private long id;
 	private String nome;
 	private String email;
